@@ -95,7 +95,7 @@ class PostPagesTests(TestCase):
 
         self.follower_user = User.objects.create_user(username='follower')
         self.creator_user = User.objects.create_user(username='creator')
-        
+
         not_auth_client = User.objects.create(username="TestName")
         self.authorized_client_2 = Client()
         self.authorized_client_2.force_login(not_auth_client)
