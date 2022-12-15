@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block content %}
+{% load static %}
+  <h1>Привет, я студент ЯП</h1>
+  <p>
+    Извините, с фантазией плохо, зато умею вставлять картинки 
+  </p>
+  
+  <p>
+      <img src={% static "img/123.png"%} alt="Это моя картинка которая походу не загрузилась"  width="500" height="500">
+  </p>
+{% endblock %}
