@@ -49,11 +49,13 @@ class StaticURLTests(TestCase):
             'follow': reverse('posts:profile_follow',
                                kwargs={'username': cls.author.username}),
 
-            'post_author_profile': reverse('posts:profile',
-                               kwargs={'username': cls.author.username}),
+            'post_author_profile': reverse(
+                'posts:profile',
+                kwargs={'username': cls.author.username}
+            ),
 
             'unfollow': reverse('posts:profile_unfollow',
-                               kwargs={'username': cls.author.username}),
+                                kwargs={'username': cls.author.username}),
 
             'add_comment': reverse('posts:add_comment',
                                    kwargs={'post_id': cls.post.id}),
@@ -159,8 +161,8 @@ class StaticURLTests(TestCase):
             ('posts/post_detail.html', self.page_names_urls['post_detail']),
             ('posts/create_post.html', self.page_names_urls['post_edit']),
             ('posts/create_post.html', self.page_names_urls['post_create']),
-
-            ('posts/follow.html', self.page_names_urls['follow_index']),  # Добавлено
+            # Добавлено
+            ('posts/follow.html', self.page_names_urls['follow_index']),
         ]
 
         for tempalate_url_couple in template_url_names:

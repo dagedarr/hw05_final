@@ -318,7 +318,7 @@ class PostPagesTests(TestCase):
         self.authorized_client.get(
             reverse(
                 'posts:profile_follow',
-                 kwargs={'username': self.creator_user.username}
+                kwargs={'username': self.creator_user.username}
             )
         )
 
@@ -331,8 +331,8 @@ class PostPagesTests(TestCase):
 
         # Подписались
         follow = Follow.objects.create(
-            user = self.follower_user,
-            author = self.creator_user
+            user=self.follower_user,
+            author=self.creator_user
         )
 
         # Подписка прошла
@@ -380,6 +380,7 @@ class PostPagesTests(TestCase):
         )
         # Поста там нет
         self.assertNotIn(exclusive_post, response.context["page_obj"])
+
 
 class PaginatorViewsTest(TestCase):
     """Проверка корректной работы пагинатора на index, group_list, profile."""

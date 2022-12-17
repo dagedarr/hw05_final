@@ -28,6 +28,7 @@ class GroupAdmin(admin.ModelAdmin):
     list_filter = ('title',)
     empty_value_display = '-пусто-'
 
+
 class CommentAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
@@ -41,12 +42,14 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('created',)
     empty_value_display = '-пусто-'
 
+
 class FollowAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'user',
         'author',
     )
+
 
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Post, PostAdmin)
