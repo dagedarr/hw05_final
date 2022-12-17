@@ -41,7 +41,22 @@ class StaticURLTests(TestCase):
             'post_edit': reverse('posts:post_edit',
                                  kwargs={'post_id': cls.post.id}),
             'post_create': reverse('posts:post_create'),
-            'unexisting_page': '/unexisting_page/'
+
+            'unexisting_page': '/unexisting_page/',
+
+            'follow_index': reverse('posts:follow_index'),
+
+            'follow': reverse('posts:profile_follow',
+                               kwargs={'username': cls.author.username}),
+
+            'post_author_profile': reverse('posts:profile',
+                               kwargs={'username': cls.author.username}),
+
+            'unfollow': reverse('posts:profile_unfollow',
+                               kwargs={'username': cls.author.username}),
+
+            'add_comment': reverse('posts:add_comment',
+                                   kwargs={'post_id': cls.post.id}),
         }
 
     def setUp(self):
@@ -83,6 +98,57 @@ class StaticURLTests(TestCase):
         response = self.guest_client.get(url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
+    def test_follow_feed_available_for_auth(self):  # Добавлено
+        """"Лента подписок доступна авторизованному пользователю"""
+        url = self.page_names_urls['follow_index']
+        response = self.authorized_client.get(url)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_follow_author_available_for_auth(self):  # Добавлено
+        """"Авторизованный пользователь может подписаться"""
+        url = self.page_names_urls['follow']
+        response = self.authorized_client.get(url)
+        expected_url = self.page_names_urls['post_author_profile']
+        self.assertRedirects(
+            response=response,
+            expected_url=expected_url,
+            status_code=HTTPStatus.FOUND,
+            target_status_code=HTTPStatus.OK,
+        )
+
+    def test_unfollow_author_available_for_auth(self):  # Добавлено
+        """"Авторизованный пользователь может отписаться"""
+        # Сначала подписались
+        follow_url = self.page_names_urls['follow']
+        self.authorized_client.get(follow_url)
+
+        # Потом отписались
+        unfollow_url = self.page_names_urls['unfollow']
+        response = self.authorized_client.get(unfollow_url)
+
+        expected_url = self.page_names_urls['index']
+
+        self.assertRedirects(
+            response=response,
+            expected_url=expected_url,
+            status_code=HTTPStatus.FOUND,
+            target_status_code=HTTPStatus.OK,
+        )
+
+    def test_add_coment_available_for_auth(self):  # Добавлено
+        """"Комментарии доступны авторизованному пользователю"""
+        url = self.page_names_urls['add_comment']
+        response = self.authorized_client.get(url)
+
+        expected_url = self.page_names_urls['post_detail']
+
+        self.assertRedirects(
+            response=response,
+            expected_url=expected_url,
+            status_code=HTTPStatus.FOUND,
+            target_status_code=HTTPStatus.OK,
+        )
+
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
 
@@ -93,6 +159,8 @@ class StaticURLTests(TestCase):
             ('posts/post_detail.html', self.page_names_urls['post_detail']),
             ('posts/create_post.html', self.page_names_urls['post_edit']),
             ('posts/create_post.html', self.page_names_urls['post_create']),
+
+            ('posts/follow.html', self.page_names_urls['follow_index']),  # Добавлено
         ]
 
         for tempalate_url_couple in template_url_names:

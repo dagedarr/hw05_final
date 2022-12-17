@@ -310,40 +310,41 @@ class PostPagesTests(TestCase):
         # Первый контент и контент с очищенным кешем различаются
         self.assertNotEqual(page_in_cache, page_with_delited_post)
 
-    def test_authorized_can_follow_and_unfollow(self):
-        """Подписка и отписка работают."""
+    def test_authorized_can_follow(self):
+        """Подписка работает."""
         follow_count = Follow.objects.count()
 
         # Подписались
         self.authorized_client.get(
             reverse(
                 'posts:profile_follow',
-                kwargs={'username': self.creator_user.username}
+                 kwargs={'username': self.creator_user.username}
             )
         )
 
         # Подсчитали что подписка прошла
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
-        # Отписались
-        self.authorized_client.get(
-            reverse(
-                'posts:profile_unfollow',
-                kwargs={'username': self.creator_user.username}
-            )
+    def test_authorized_can_unfollow(self):
+        """Отписка работает."""
+        follow_count = Follow.objects.count()
+
+        # Подписались
+        follow = Follow.objects.create(
+            user = self.follower_user,
+            author = self.creator_user
         )
+
+        # Подписка прошла
+        self.assertEqual(Follow.objects.count(), follow_count + 1)
+        # Отписались
+        follow.delete()
 
         # Подсчитали что количество подписок обнулилось
-        self.assertEqual(Follow.objects.all().count(), 0)
+        self.assertEqual(follow_count, 0)
 
-    def test_subscription_feed(self):
-        """Запись появляется для подписчиков
-           и не появляется для неподписанных."""
-        # Создаем пост
-        exclusive_post = Post.objects.create(
-            text='Текст для подписчиков',
-            author=self.post.author
-        )
+    def test_subscription_feed_for_authorized(self):
+        """Запись появляется для подписчиков."""
         # Оформляем подписку
         self.authorized_client.get(
             reverse(
@@ -351,6 +352,13 @@ class PostPagesTests(TestCase):
                 kwargs={'username': self.post.author.username}
             )
         )
+
+        # Создаем пост
+        exclusive_post = Post.objects.create(
+            text='Текст для подписчиков',
+            author=self.post.author
+        )
+
         # Заходим на страницу постов подписок
         response = self.authorized_client.get(
             reverse('posts:follow_index')
@@ -360,13 +368,18 @@ class PostPagesTests(TestCase):
         exclusive_post_text = response.context['page_obj'][0].text
         self.assertEqual(exclusive_post_text, exclusive_post.text)
 
-        # Заходим на страницу постов подписок неподписанным пользователем
+    def test_subscription_feed_for_guest(self):
+        """Запись не появляется для неподписанных."""
+        # Создаем пост
+        exclusive_post = Post.objects.create(
+            text='Текст для подписчиков',
+            author=self.post.author
+        )
         response = self.authorized_client_2.get(
             reverse('posts:follow_index')
         )
         # Поста там нет
         self.assertNotIn(exclusive_post, response.context["page_obj"])
-
 
 class PaginatorViewsTest(TestCase):
     """Проверка корректной работы пагинатора на index, group_list, profile."""

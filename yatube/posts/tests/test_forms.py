@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from posts.models import Group, Post
+from posts.models import Comment, Group, Post
 
 User = get_user_model()
 
@@ -121,6 +121,23 @@ class TestCreateForm(TestCase):
         self.assertNotEqual(text_before_editing, edited_post.text)
         self.assertEqual(group_before_editing, edited_post.group.id)
         self.assertEqual(author_before_editing, edited_post.author)
+
+    def test_comment_form(self):
+        """Проверка что форма комментария корректна."""
+
+        comment_form = {
+            'text': 'Тестовый текст комментария',
+        }
+
+        # Оставили комментарий
+        self.authorized_client.post(
+            reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
+            data=comment_form,
+        )
+        # Нашли его
+        comment = self.post.comments.first().text
+
+        self.assertEqual(comment_form['text'], comment)
 
     def test_guest_cant_create_post(self):
         post_count = Post.objects.count()
