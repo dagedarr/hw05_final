@@ -325,6 +325,15 @@ class PostPagesTests(TestCase):
         # Подсчитали что подписка прошла
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
+        # Получили объект подписки
+        follow = Follow.objects.first()
+
+        # Проверили поля
+        self.assertEqual(follow.user.username,
+                         self.user.username)
+        self.assertEqual(follow.author.username,
+                         self.creator_user.username)
+
     def test_authorized_can_unfollow(self):
         """Отписка работает."""
         follow_count = Follow.objects.count()
@@ -340,8 +349,8 @@ class PostPagesTests(TestCase):
         # Отписались
         follow.delete()
 
-        # Подсчитали что количество подписок обнулилось
-        self.assertEqual(follow_count, 0)
+        # Подсчитали что количество подписок уменьшилось
+        self.assertEqual(Follow.objects.count(), follow_count)
 
     def test_subscription_feed_for_authorized(self):
         """Запись появляется для подписчиков."""
