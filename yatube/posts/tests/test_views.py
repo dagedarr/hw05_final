@@ -339,7 +339,7 @@ class PostPagesTests(TestCase):
         follow_count = Follow.objects.count()
 
         # Подписались
-        follow = Follow.objects.create(
+        Follow.objects.create(
             user=self.follower_user,
             author=self.creator_user
         )
@@ -347,7 +347,10 @@ class PostPagesTests(TestCase):
         # Подписка прошла
         self.assertEqual(Follow.objects.count(), follow_count + 1)
         # Отписались
-        follow.delete()
+        Follow.objects.filter(
+            user=self.follower_user,
+            author=self.creator_user           
+        ).delete()
 
         # Подсчитали что количество подписок уменьшилось
         self.assertEqual(Follow.objects.count(), follow_count)
