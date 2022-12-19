@@ -349,7 +349,7 @@ class PostPagesTests(TestCase):
         # Отписались
         Follow.objects.filter(
             user=self.follower_user,
-            author=self.creator_user           
+            author=self.creator_user
         ).delete()
 
         # Подсчитали что количество подписок уменьшилось
