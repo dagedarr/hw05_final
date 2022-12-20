@@ -339,18 +339,20 @@ class PostPagesTests(TestCase):
         follow_count = Follow.objects.count()
 
         # Подписались
-        Follow.objects.create(
-            user=self.follower_user,
+        f = Follow.objects.create(
+            user=self.user,
             author=self.creator_user
         )
 
         # Подписка прошла
         self.assertEqual(Follow.objects.count(), follow_count + 1)
         # Отписались
-        Follow.objects.filter(
-            user=self.follower_user,
-            author=self.creator_user
-        ).delete()
+        self.authorized_client.get(
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': self.creator_user.username}
+            )
+        )
 
         # Подсчитали что количество подписок уменьшилось
         self.assertEqual(Follow.objects.count(), follow_count)
