@@ -339,7 +339,7 @@ class PostPagesTests(TestCase):
         follow_count = Follow.objects.count()
 
         # Подписались
-        f = Follow.objects.create(
+        Follow.objects.create(
             user=self.user,
             author=self.creator_user
         )
